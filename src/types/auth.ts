@@ -35,3 +35,15 @@ export interface RegisterUserResponse {
     profilePicture?: string;
   };
 }
+
+export interface User {
+  id: number;
+  email: string;
+  role: "STUDENT" | "LECTURER" | "COORDINATOR";
+  profile: {
+    name: string;
+    profilePicture?: string;
+    nim?: string;
+    nip?: string;
+  } | null;
+}
