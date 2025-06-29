@@ -7,10 +7,11 @@ import { Label } from "@/components/ui/label";
 import { Card, CardContent } from "@/components/ui/card";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import useAuth from "@/hooks/useAuth";
-import axios from "axios";
 import { Loader2, Eye, EyeOff, Mail, KeyRound, Leaf } from "lucide-react";
 import ReCAPTCHA from "react-google-recaptcha";
+import { toaster } from "@/lib/sonner";
 import { handleError } from "@/lib/utils";
+import axios from "axios";
 
 const signInSchema = z.object({
   email: z
@@ -69,6 +70,7 @@ const Login = () => {
     if (isLoading) return;
 
     setIsLoading(true);
+    setFormErrors({});
 
     try {
       const result = signInSchema.safeParse({ email, password });
@@ -104,7 +106,8 @@ const Login = () => {
       localStorage.setItem("token", token);
       navigate("/dashboard");
     } catch (err) {
-      setFormErrors({ email: undefined, password: handleError(err) });
+      const errorMessage = handleError(err);
+      toaster.error(errorMessage);
       setIsLoading(false);
     }
   };
