@@ -8,18 +8,32 @@ interface User {
   profilePicture?: string;
 }
 
-interface AuthContextType {
+interface AuthState {
   user: User | null;
-  setUser: (user: User | null) => void;
+  token: string | null;
+}
+
+interface AuthContextType {
+  auth: AuthState;
+  setAuth: (auth: AuthState) => void;
+  logout: () => void;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
-  const [user, setUser] = useState<User | null>(null);
+  const [auth, setAuth] = useState<AuthState>({
+    user: null,
+    token: localStorage.getItem("token") || null,
+  });
+
+  const logout = () => {
+    setAuth({ user: null, token: null });
+    localStorage.removeItem("token");
+  };
 
   return (
-    <AuthContext.Provider value={{ user, setUser }}>
+    <AuthContext.Provider value={{ auth, setAuth, logout }}>
       {children}
     </AuthContext.Provider>
   );
