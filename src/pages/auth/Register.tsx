@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useMutation } from "@tanstack/react-query";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { z } from "zod";
 import { toaster } from "@/lib/sonner";
 import { registerEmail, verifyOtp, registerUser } from "@/services/api/auth";
@@ -25,6 +25,7 @@ import {
   EyeOffIcon,
 } from "lucide-react";
 import Stepper from "@/components/Stepper";
+import { handleError } from "@/lib/utils"; // Impor handleError dari lib/utils.ts
 
 // Skema validasi Zod
 const emailSchema = z.object({
@@ -124,7 +125,8 @@ const Register = () => {
   const [role, setRole] = useState<"LECTURER" | "STUDENT" | null>(null);
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-  const { setUser } = useAuth();
+  const { setAuth } = useAuth();
+  const navigate = useNavigate();
 
   const steps = ["Email", "Verify", "Details"];
 
@@ -200,8 +202,8 @@ const Register = () => {
       setCurrentStep(2);
       startResendCountdown();
     },
-    onError: (error: any) => {
-      const message = error.response?.data?.error || "Gagal mengirim OTP";
+    onError: (error) => {
+      const message = handleError(error);
       toaster.error(message);
     },
   });
@@ -211,8 +213,8 @@ const Register = () => {
     onSuccess: (data) => {
       toaster.success(data.message);
     },
-    onError: (error: any) => {
-      const message = error.response?.data?.error || "Gagal memverifikasi OTP";
+    onError: (error) => {
+      const message = handleError(error);
       toaster.error(message);
       setCurrentStep(1);
     },
@@ -223,10 +225,11 @@ const Register = () => {
       registerUser(data.data, data.file),
     onSuccess: (data) => {
       toaster.success(data.message);
-      setUser(data.user);
+      setAuth({ user: data.user, token: null });
+      navigate("/login");
     },
-    onError: (error: any) => {
-      const message = error.response?.data?.error || "Gagal mendaftar pengguna";
+    onError: (error) => {
+      const message = handleError(error);
       toaster.error(message);
     },
   });
@@ -739,7 +742,7 @@ const Register = () => {
   return (
     <div className="min-h-screen w-full lg:grid lg:grid-cols-2 bg-white">
       {/* Left Column - Register Form */}
-      <div className="flex items-center justify-center  px-4 sm:px-6 lg:px-0">
+      <div className="flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
         <div className="w-full max-w-xl space-y-8">
           <div className="text-center">
             <div className="flex flex-col items-center gap-1 mb-6">
@@ -777,7 +780,7 @@ const Register = () => {
               © {new Date().getFullYear()} S1 Teknik Lingkungan - Universitas
               Riau
             </p>
-            <p className="mt-1">LATEST</p>
+            <p className="mt-1">Latest</p>
           </div>
         </div>
       </div>
