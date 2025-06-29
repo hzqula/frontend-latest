@@ -4,6 +4,7 @@ import { AuthProvider } from "./contexts/AuthContext";
 import queryClient from "./lib/queryClient";
 import Register from "./pages/auth/Register";
 import { Toaster } from "sonner";
+import Login from "./pages/auth/Login";
 
 const App = () => {
   return (
@@ -12,6 +13,7 @@ const App = () => {
         <BrowserRouter>
           <Routes>
             <Route path="/register" element={<Register />} />
+            <Route path="/login" element={<Login />} />
             {/* Tambahkan rute lain di sini */}
           </Routes>
         </BrowserRouter>
